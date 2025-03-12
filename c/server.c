@@ -1,63 +1,5 @@
 #include "common.h"
 
-/**
- * @brief Read a TCP stream from a loop until a terminating newline character
- * is found, or the buffer is full.
- *
- * @param fd Client file descriptor
- * @param buf Allocated buffer
- * @param count Max buffer size
- * @return size_t
- */
-size_t readfromstream(int fd, char *buf, size_t count)
-{
-    size_t total = 0;
-    ssize_t n;
-
-    while (total < count)
-    {
-        n = recv(fd, buf + total, count - total, 0);
-        if (n == -1)
-        {
-            perror("read");
-            break;
-        }
-        if (n == 0)
-        {
-            break;
-        }
-
-        total += (size_t)n;
-
-        if (buf[total - 1] == '\n')
-        {
-            break;
-        }
-    }
-
-    return total;
-}
-
-size_t writetoclient(int fd, const char *buf, size_t count)
-{
-    size_t total = 0;
-    ssize_t n;
-
-    while (total < count)
-    {
-        n = send(fd, buf + total, count - total, 0);
-        if (n == -1)
-        {
-            perror("write");
-            break;
-        }
-
-        total += (size_t)n;
-    }
-
-    return total;
-}
-
 int main()
 {
     int sfd = -1;
@@ -149,7 +91,7 @@ int main()
         totalread = readfromstream(cfd, buf, BUFSIZ);
 
         // Write to client
-        totalsent = writetoclient(cfd, msgfromserver, strlen(msgfromserver));
+        totalsent = writetostream(cfd, msgfromserver, strlen(msgfromserver));
 
         // Print received data
         // Note: totalread - 2 to remove the newline character
