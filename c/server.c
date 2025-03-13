@@ -52,7 +52,7 @@ int main()
     }
 
     // Listen for connections
-    if (listen(sfd, 1) == -1)
+    if (listen(sfd, SOMAXCONN) == -1)
     {
         perror("listen");
         exit(EXIT_FAILURE);
